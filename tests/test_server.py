@@ -9,6 +9,10 @@ class TestShowSummary:
     clubs_test = [
         {"name": "club TEST 01", "email": "club01@test.com", "points": "20"},
     ]
+    # interessant, tu peux être plus précise dans la définition de ton jeu de données :
+    good_email1 = "club01@test.com"
+    club1 = {"name": "club TEST 01", "email": good_email1, "points": "20"}
+    clubs = [club1]
 
     def setup(self):
         """Change server.py variable datas."""
@@ -18,10 +22,14 @@ class TestShowSummary:
         """
         Test if the email is recognised: it returns (200).
         """
+        # essai d'être plus précise ici : montrer dans le test ce que tu attend vraiment:
+        result = self.client_test.post("/showSummary", data={"email": good_email1}  # on lit bien ici que tu attend une email valide.
+        # au lieu de :
         result = self.client_test.post(
             "/showSummary", data={"email": self.clubs_test[0]["email"]}
         )
         assert result.status_code in [200]
+        # Dans tous les cas c'est très bien
 
     def test_bad_email(self):
         """
@@ -61,6 +69,12 @@ class TestBook:
 
     def test_book_new_competition(self):
         """Test if the competition date >= today : it returns (200)."""
+        # évite la concaténation avec les +, c'est cryptique et lent pour python. Utilise les f-string à la place:
+        url = f"/book/{self.competitions_test[0]['name']}/{self.club_test[0]['name']}"
+        # si tu fais comme conseillé plus haut en découpant tes données, tu pourrais même avoir une chaîne plus lsiible:
+        url = f"/book/{competition1['name']}/{club1['name'}"
+        result = self.client.get(url)
+        # au lieu de :
         result = self.client_test.get(
             "/book/"
             + self.competitions_test[0]["name"]
@@ -71,6 +85,7 @@ class TestBook:
 
     def test_book_old_competition(self):
         """Test if the competition date < today : it returns (403)."""
+        # pareil que plus haut
         result = self.client_test.get(
             "/book/"
             + self.competitions_test[1]["name"]
@@ -78,6 +93,8 @@ class TestBook:
             + self.clubs_test[0]["name"]
         )
         assert result.status_code in [403]
+                                                    
+# mêmes remaruqes que plus haut pour le reste
 
 
 class TestPurchasePlace:
@@ -200,3 +217,9 @@ class TestLog:
         """Test if the user logs out : it returns (302)."""
         response = self.client_test.get("/logout")
         assert response.status_code in [302]
+                                                    
+                                                    
+# Test tests sont pertinents et bien documentés ! Il sont un bonne référence pour savoir ce que fait ton code, bravo tu as bien comprit le principe.
+# Mes seules recommandations sont dans la simplification de la lecture des tests, notament en évitant les longs chaînage de dictionnaires,
+# grâce à un meilleur découpage des données de test. ;)
+# Bravo sinon.
